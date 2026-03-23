@@ -1,0 +1,207 @@
+{
+  "_comment": "Ground truth: 22 CVEs found by Anthropic's Claude Opus 4.6 in Firefox 147, fixed in Firefox 148 (MFSA 2026-13). Source dirs are best-effort mappings from component names to Firefox source tree.",
+  "source_version": "147.0",
+  "advisory": "MFSA 2026-13",
+  "advisory_url": "https://www.mozilla.org/en-US/security/advisories/mfsa2026-13/",
+  "cves": [
+    {
+      "id": "CVE-2026-2758",
+      "component": "JavaScript: GC",
+      "vuln_type": "use-after-free",
+      "severity": "high",
+      "source_dirs": ["js/src/gc"],
+      "source_files_hint": [],
+      "notes": "UAF in GC component"
+    },
+    {
+      "id": "CVE-2026-2795",
+      "component": "JavaScript: GC",
+      "vuln_type": "use-after-free",
+      "severity": "high",
+      "source_dirs": ["js/src/gc"],
+      "source_files_hint": [],
+      "notes": "UAF in GC component"
+    },
+    {
+      "id": "CVE-2026-2797",
+      "component": "JavaScript: GC",
+      "vuln_type": "use-after-free",
+      "severity": "high",
+      "source_dirs": ["js/src/gc"],
+      "source_files_hint": [],
+      "notes": "UAF in GC component"
+    },
+    {
+      "id": "CVE-2026-2763",
+      "component": "JavaScript Engine",
+      "vuln_type": "use-after-free",
+      "severity": "high",
+      "source_dirs": ["js/src/vm", "js/src/jit"],
+      "source_files_hint": [],
+      "notes": "UAF in JS engine"
+    },
+    {
+      "id": "CVE-2026-2765",
+      "component": "JavaScript Engine",
+      "vuln_type": "use-after-free",
+      "severity": "high",
+      "source_dirs": ["js/src/vm"],
+      "source_files_hint": [],
+      "notes": "UAF in JS engine"
+    },
+    {
+      "id": "CVE-2026-2764",
+      "component": "JavaScript Engine: JIT",
+      "vuln_type": "jit-miscompilation",
+      "severity": "high",
+      "source_dirs": ["js/src/jit"],
+      "source_files_hint": [],
+      "notes": "JIT miscompilation leading to UAF"
+    },
+    {
+      "id": "CVE-2026-2766",
+      "component": "JavaScript Engine: JIT",
+      "vuln_type": "use-after-free",
+      "severity": "high",
+      "source_dirs": ["js/src/jit"],
+      "source_files_hint": [],
+      "notes": "UAF in JIT"
+    },
+    {
+      "id": "CVE-2026-2796",
+      "component": "JavaScript: WebAssembly",
+      "vuln_type": "jit-miscompilation",
+      "severity": "critical",
+      "cvss": 9.8,
+      "source_dirs": ["js/src/wasm"],
+      "source_files_hint": ["js/src/wasm/WasmInstance.cpp"],
+      "notes": "JIT miscompilation in WebAssembly. Confirmed file: WasmInstance.cpp, functions: MaybeOptimizeFunctionCallBind, Instance::init, getExportedFunction"
+    },
+    {
+      "id": "CVE-2026-2767",
+      "component": "JavaScript: WebAssembly",
+      "vuln_type": "use-after-free",
+      "severity": "high",
+      "source_dirs": ["js/src/wasm"],
+      "source_files_hint": [],
+      "notes": "UAF in WebAssembly"
+    },
+    {
+      "id": "CVE-2026-2762",
+      "component": "JavaScript: Standard Library",
+      "vuln_type": "integer-overflow",
+      "severity": "high",
+      "source_dirs": ["js/src/builtin"],
+      "source_files_hint": [],
+      "notes": "Integer overflow in JS standard library"
+    },
+    {
+      "id": "CVE-2026-2798",
+      "component": "DOM: Core & HTML",
+      "vuln_type": "use-after-free",
+      "severity": "high",
+      "source_dirs": ["dom/base", "dom/html"],
+      "source_files_hint": [],
+      "notes": "UAF in DOM"
+    },
+    {
+      "id": "CVE-2026-2799",
+      "component": "DOM: Core & HTML",
+      "vuln_type": "use-after-free",
+      "severity": "high",
+      "source_dirs": ["dom/base", "dom/html"],
+      "source_files_hint": [],
+      "notes": "UAF in DOM"
+    },
+    {
+      "id": "CVE-2026-2770",
+      "component": "DOM: Bindings (WebIDL)",
+      "vuln_type": "use-after-free",
+      "severity": "high",
+      "source_dirs": ["dom/bindings"],
+      "source_files_hint": [],
+      "notes": "UAF in DOM bindings"
+    },
+    {
+      "id": "CVE-2026-2769",
+      "component": "Storage: IndexedDB",
+      "vuln_type": "use-after-free",
+      "severity": "high",
+      "source_dirs": ["dom/indexedDB"],
+      "source_files_hint": [],
+      "notes": "UAF in IndexedDB"
+    },
+    {
+      "id": "CVE-2026-2768",
+      "component": "Storage: IndexedDB",
+      "vuln_type": "sandbox-escape",
+      "severity": "high",
+      "source_dirs": ["dom/indexedDB"],
+      "source_files_hint": [],
+      "notes": "Sandbox escape via incorrect boundary conditions"
+    },
+    {
+      "id": "CVE-2026-2757",
+      "component": "WebRTC: Audio/Video",
+      "vuln_type": "boundary-error",
+      "severity": "high",
+      "source_dirs": ["dom/media", "media/webrtc"],
+      "source_files_hint": [],
+      "notes": "Incorrect boundary conditions in WebRTC"
+    },
+    {
+      "id": "CVE-2026-2772",
+      "component": "Audio/Video: Playback",
+      "vuln_type": "use-after-free",
+      "severity": "high",
+      "source_dirs": ["dom/media"],
+      "source_files_hint": [],
+      "notes": "UAF in media playback"
+    },
+    {
+      "id": "CVE-2026-2759",
+      "component": "Graphics: ImageLib",
+      "vuln_type": "boundary-error",
+      "severity": "high",
+      "source_dirs": ["image"],
+      "source_files_hint": [],
+      "notes": "Incorrect boundary conditions in image handling"
+    },
+    {
+      "id": "CVE-2026-2760",
+      "component": "Graphics: WebRender",
+      "vuln_type": "sandbox-escape",
+      "severity": "high",
+      "source_dirs": ["gfx/wr"],
+      "source_files_hint": [],
+      "notes": "Sandbox escape via boundary error. Note: WebRender is largely Rust, but has C++ bindings"
+    },
+    {
+      "id": "CVE-2026-2761",
+      "component": "Graphics: WebRender",
+      "vuln_type": "sandbox-escape",
+      "severity": "high",
+      "source_dirs": ["gfx/wr"],
+      "source_files_hint": [],
+      "notes": "Sandbox escape"
+    },
+    {
+      "id": "CVE-2026-2771",
+      "component": "DOM: Core & HTML",
+      "vuln_type": "undefined-behavior",
+      "severity": "high",
+      "source_dirs": ["dom/base", "dom/html"],
+      "source_files_hint": [],
+      "notes": "Undefined behavior in DOM"
+    },
+    {
+      "id": "CVE-2026-2794",
+      "component": "Firefox/Android",
+      "vuln_type": "uninitialized-memory",
+      "severity": "high",
+      "source_dirs": ["mobile/android"],
+      "source_files_hint": [],
+      "notes": "Information disclosure via uninitialized memory. May be Java/Kotlin, not C++."
+    }
+  ]
+}
