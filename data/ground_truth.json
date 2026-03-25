@@ -1,207 +1,329 @@
 {
-  "_comment": "Ground truth: 22 CVEs found by Anthropic's Claude Opus 4.6 in Firefox 147, fixed in Firefox 148 (MFSA 2026-13). Source dirs are best-effort mappings from component names to Firefox source tree.",
+  "_comment": "Ground truth: 22 CVEs fixed in Firefox 148 (MFSA 2026-13). ~14 discovered by Anthropic Claude Opus 4.6, others by independent researchers. Exact files and functions from commit patches.",
   "source_version": "147.0",
   "advisory": "MFSA 2026-13",
   "advisory_url": "https://www.mozilla.org/en-US/security/advisories/mfsa2026-13/",
+  "anthropic_blog": "https://www.anthropic.com/news/mozilla-firefox-security",
   "cves": [
     {
       "id": "CVE-2026-2758",
+      "bugzilla": 2009608,
+      "commit": "3f043963046d",
       "component": "JavaScript: GC",
       "vuln_type": "use-after-free",
       "severity": "high",
-      "source_dirs": ["js/src/gc"],
-      "source_files_hint": [],
-      "notes": "UAF in GC component"
+      "reporter": "Gary Kwong",
+      "source_dirs": ["mfbt"],
+      "source_files_hint": ["mfbt/HashTable.h"],
+      "functions": ["HashTableEntry::swap()"],
+      "notes": "Move assignment on non-live hash table entries bypassed GC barrier wrappers. Fix: use placement new construction instead."
     },
     {
       "id": "CVE-2026-2795",
+      "bugzilla": 2010940,
+      "commit": "84d5f2977b65",
       "component": "JavaScript: GC",
       "vuln_type": "use-after-free",
       "severity": "high",
-      "source_dirs": ["js/src/gc"],
-      "source_files_hint": [],
-      "notes": "UAF in GC component"
+      "reporter": "x0e",
+      "source_dirs": ["js/src/builtin", "js/src/gc"],
+      "source_files_hint": [
+        "js/src/builtin/FinalizationRegistryObject.cpp",
+        "js/src/builtin/FinalizationRegistryObject.h",
+        "js/src/gc/FinalizationObservers.cpp"
+      ],
+      "functions": ["FinalizationQueueObject::clear()", "traceWeakFinalizationRegistries()", "shouldQueueFinalizationRegistryForCleanup()"],
+      "notes": "When a FinalizationRegistryObject was GC'd, queued FinalizationRecordObjects were not cleared, leaving dangling pointers."
     },
     {
       "id": "CVE-2026-2797",
+      "bugzilla": 2013561,
+      "commit": "7788fae9fbf5",
       "component": "JavaScript: GC",
       "vuln_type": "use-after-free",
       "severity": "high",
+      "reporter": "Anthropic",
       "source_dirs": ["js/src/gc"],
-      "source_files_hint": [],
-      "notes": "UAF in GC component"
+      "source_files_hint": [
+        "js/src/gc/GCRuntime.h",
+        "js/src/gc/Marking.cpp",
+        "js/src/gc/Sweeping.cpp",
+        "js/src/gc/WeakMap-inl.h"
+      ],
+      "functions": ["markIncomingSymbolEdgesFromUncollectedZones()", "markWeakReferences()", "markWeakReferencesInCurrentGroup()", "WeakMap::markEntry()"],
+      "notes": "Symbols referenced by uncollected zones not marked correctly during weak marking, causing premature collection."
     },
     {
       "id": "CVE-2026-2763",
+      "bugzilla": 2012018,
+      "commit": "2d83ee6d8a2e",
       "component": "JavaScript Engine",
       "vuln_type": "use-after-free",
       "severity": "high",
-      "source_dirs": ["js/src/vm", "js/src/jit"],
-      "source_files_hint": [],
-      "notes": "UAF in JS engine"
+      "reporter": "Anthropic",
+      "source_dirs": ["js/src/vm"],
+      "source_files_hint": ["js/src/vm/Iteration.cpp"],
+      "functions": ["SuppressDeletedProperty()"],
+      "notes": "Unsafe prototype chain property lookup. Fix: use safer pure-lookup functions (LookupPropertyPure, GetPropertyAttributes)."
     },
     {
       "id": "CVE-2026-2765",
+      "bugzilla": 2013562,
+      "commit": "1434a6384f2b",
       "component": "JavaScript Engine",
       "vuln_type": "use-after-free",
       "severity": "high",
-      "source_dirs": ["js/src/vm"],
-      "source_files_hint": [],
-      "notes": "UAF in JS engine"
+      "reporter": "Anthropic",
+      "source_dirs": ["js/src/builtin"],
+      "source_files_hint": ["js/src/builtin/AtomicsObject.cpp"],
+      "functions": ["js::atomics_notify_impl()"],
+      "notes": "Missing AutoRealm when resolving same-thread waitAsync promises. Promise resolution happened in wrong realm, causing UAF."
     },
     {
       "id": "CVE-2026-2764",
+      "bugzilla": 2012608,
+      "commit": "1b58f51668d3",
       "component": "JavaScript Engine: JIT",
       "vuln_type": "jit-miscompilation",
       "severity": "high",
-      "source_dirs": ["js/src/jit"],
-      "source_files_hint": [],
-      "notes": "JIT miscompilation leading to UAF"
+      "reporter": "Anthropic",
+      "source_dirs": ["js/src/jit", "js/src/vm"],
+      "source_files_hint": [
+        "js/src/jit/BaselineCacheIRCompiler.cpp",
+        "js/src/jit/BaselineCacheIRCompiler.h",
+        "js/src/jit/VMFunctions.cpp",
+        "js/src/jit/VMFunctions.h",
+        "js/src/vm/PortableBaselineInterpret.cpp"
+      ],
+      "functions": ["pushArguments()", "pushStandardArguments()", "createThis()", "CreateThisFromIC()", "ICInterpretOps()"],
+      "notes": "CreateThis executed before arguments were pushed to stack. Arguments on stack not traced during GC. Fix: reorder CreateThis after argument push."
     },
     {
       "id": "CVE-2026-2766",
+      "bugzilla": 2013583,
+      "commit": "9f8e886fa8c6",
       "component": "JavaScript Engine: JIT",
       "vuln_type": "use-after-free",
       "severity": "high",
+      "reporter": "Anthropic",
       "source_dirs": ["js/src/jit"],
-      "source_files_hint": [],
-      "notes": "UAF in JIT"
+      "source_files_hint": [
+        "js/src/jit/BaselineIC.h",
+        "js/src/jit/CacheIR.cpp",
+        "js/src/jit/CacheIR.h",
+        "js/src/jit/CacheIRCloner.h",
+        "js/src/jit/CacheIRCompiler.cpp",
+        "js/src/jit/CacheIROps.yaml",
+        "js/src/jit/CacheIRWriter.h",
+        "js/src/jit/JitScript.cpp",
+        "js/src/jit/WarpOracle.cpp",
+        "js/src/jit/WarpSnapshot.cpp"
+      ],
+      "functions": ["ICCacheIRStub::clone()", "ICScript::purgeStubs()", "MarkActiveICScriptsAndCopyStubs()", "TraceCacheIRStub()"],
+      "notes": "ICScripts not marked active when cloning stubs, causing UAF. Fix: proper active-state tracking during stub cloning."
     },
     {
       "id": "CVE-2026-2796",
+      "bugzilla": 2013165,
+      "commit": "f3659176c1eb",
       "component": "JavaScript: WebAssembly",
-      "vuln_type": "jit-miscompilation",
+      "vuln_type": "type-confusion",
       "severity": "critical",
       "cvss": 9.8,
+      "reporter": "Anthropic",
       "source_dirs": ["js/src/wasm"],
       "source_files_hint": ["js/src/wasm/WasmInstance.cpp"],
-      "notes": "JIT miscompilation in WebAssembly. Confirmed file: WasmInstance.cpp, functions: MaybeOptimizeFunctionCallBind, Instance::init, getExportedFunction"
+      "functions": ["MaybeOptimizeFunctionCallBind()"],
+      "notes": "Type confusion at JS/Wasm boundary. Function.prototype.call.bind() unwrapping skipped type signature validation for Wasm functions. Enables arbitrary R/W via addrof/fakeobj. Fix: return nullptr when bound this is a Wasm function."
     },
     {
       "id": "CVE-2026-2767",
+      "bugzilla": 2013741,
+      "commit": "64e839bbc085",
       "component": "JavaScript: WebAssembly",
       "vuln_type": "use-after-free",
       "severity": "high",
+      "reporter": "Sajeeb Lohani",
       "source_dirs": ["js/src/wasm"],
-      "source_files_hint": [],
-      "notes": "UAF in WebAssembly"
+      "source_files_hint": ["js/src/wasm/WasmBaselineCompile.cpp"],
+      "functions": ["BaseCompiler::emitArrayFill()"],
+      "notes": "Missing write barrier (PreBarrierKind::None instead of Normal) in array.fill allowed GC to collect still-referenced objects."
     },
     {
       "id": "CVE-2026-2762",
+      "bugzilla": 2011649,
+      "commit": "e1c5f985b405",
       "component": "JavaScript: Standard Library",
       "vuln_type": "integer-overflow",
       "severity": "high",
+      "reporter": "Andre Bargull",
       "source_dirs": ["js/src/builtin"],
-      "source_files_hint": [],
-      "notes": "Integer overflow in JS standard library"
+      "source_files_hint": ["js/src/builtin/RegExp.cpp"],
+      "functions": ["EncodeForRegExpEscape()", "regexp_escape()"],
+      "notes": "Integer overflow in output length tracking for RegExp escape. Fix: use mozilla::CheckedInt<size_t>."
     },
     {
       "id": "CVE-2026-2798",
+      "bugzilla": 2014136,
+      "commit": "f362fcb12f3d",
       "component": "DOM: Core & HTML",
       "vuln_type": "use-after-free",
       "severity": "high",
-      "source_dirs": ["dom/base", "dom/html"],
-      "source_files_hint": [],
-      "notes": "UAF in DOM"
+      "reporter": "Sajeeb Lohani",
+      "source_dirs": ["dom/base"],
+      "source_files_hint": ["dom/base/Document.cpp"],
+      "functions": ["Document::HidePopover()"],
+      "notes": "PopoverData fetched eagerly at function start could be freed by intervening operations. Fix: fetch lazily when needed."
     },
     {
       "id": "CVE-2026-2799",
+      "bugzilla": 2014551,
+      "commit": "70d698e7fa6a",
       "component": "DOM: Core & HTML",
       "vuln_type": "use-after-free",
       "severity": "high",
-      "source_dirs": ["dom/base", "dom/html"],
-      "source_files_hint": [],
-      "notes": "UAF in DOM"
+      "reporter": "Anthropic",
+      "source_dirs": ["dom/base"],
+      "source_files_hint": [
+        "dom/base/FragmentDirective.cpp",
+        "dom/base/TextDirectiveFinder.cpp"
+      ],
+      "functions": ["FragmentDirective::FindTextFragmentsInDocument()"],
+      "notes": "Layout flush in TextDirectiveFinder caused UAF. Fix: move FlushPendingNotifications earlier in FragmentDirective."
     },
     {
       "id": "CVE-2026-2770",
+      "bugzilla": 2014585,
+      "commit": "4dac2a7f587d",
       "component": "DOM: Bindings (WebIDL)",
       "vuln_type": "use-after-free",
       "severity": "high",
+      "reporter": "Anthropic",
       "source_dirs": ["dom/bindings"],
-      "source_files_hint": [],
-      "notes": "UAF in DOM bindings"
+      "source_files_hint": ["dom/bindings/BindingUtils.cpp"],
+      "functions": ["HTMLConstructor()"],
+      "notes": "Raw Document* and CustomElementDefinition* not prevented from dangling during reentrant JS proxy traps. Fix: use RefPtr, reorder AutoConstructionDepth."
     },
     {
       "id": "CVE-2026-2769",
+      "bugzilla": 2014550,
+      "commit": "e1873df9e4f2",
       "component": "Storage: IndexedDB",
       "vuln_type": "use-after-free",
       "severity": "high",
+      "reporter": "Anthropic",
       "source_dirs": ["dom/indexedDB"],
-      "source_files_hint": [],
-      "notes": "UAF in IndexedDB"
+      "source_files_hint": ["dom/indexedDB/ActorsParent.cpp"],
+      "functions": ["FileInfoEntry::DecDeltas()", "FileInfoEntry::ResetSavepointDelta()", "DatabaseConnection::UpdateRefcountFunction::RollbackSavepoint()"],
+      "notes": "mSavepointDelta never reset after rollbacks, corrupting reference counting. Fix: add ResetSavepointDelta() called during rollback."
     },
     {
       "id": "CVE-2026-2768",
+      "bugzilla": 2014101,
+      "commit": "0e460afbdb98",
       "component": "Storage: IndexedDB",
       "vuln_type": "sandbox-escape",
       "severity": "high",
+      "reporter": "Sajeeb Lohani",
       "source_dirs": ["dom/indexedDB"],
-      "source_files_hint": [],
-      "notes": "Sandbox escape via incorrect boundary conditions"
+      "source_files_hint": [
+        "dom/indexedDB/ActorsParent.cpp",
+        "dom/indexedDB/Key.cpp",
+        "dom/indexedDB/Key.h"
+      ],
+      "functions": ["MaybeUpdateAutoIncrementKey()"],
+      "notes": "Missing buffer offset/capacity validation and inverted aTrustParams logic for content process inputs. Fix: proper validation, correct logic inversion."
     },
     {
       "id": "CVE-2026-2757",
+      "bugzilla": 2001637,
+      "commit": "c36c769970978",
       "component": "WebRTC: Audio/Video",
       "vuln_type": "boundary-error",
       "severity": "high",
-      "source_dirs": ["dom/media", "media/webrtc"],
-      "source_files_hint": [],
-      "notes": "Incorrect boundary conditions in WebRTC"
+      "reporter": "Igor Morgenstern",
+      "source_dirs": ["dom/media/webrtc"],
+      "source_files_hint": ["dom/media/webrtc/libwebrtcglue/WebrtcGmpVideoCodec.cpp"],
+      "functions": ["WebrtcGmpVideoDecoder::Decode_g()"],
+      "notes": "Missing CheckedInt validation on decode data size minus 4 bytes. Fix: add CheckedInt<uint32_t> bounds check."
     },
     {
       "id": "CVE-2026-2772",
+      "bugzilla": 2014827,
+      "commit": "a3c27d72de36",
       "component": "Audio/Video: Playback",
       "vuln_type": "use-after-free",
       "severity": "high",
-      "source_dirs": ["dom/media"],
-      "source_files_hint": [],
-      "notes": "UAF in media playback"
+      "reporter": "Anthropic",
+      "source_dirs": ["third_party/rust/mp4parse_capi"],
+      "source_files_hint": ["third_party/rust/mp4parse_capi/src/lib.rs"],
+      "functions": ["set_data()", "set_indices()"],
+      "notes": "mp4parse-rust: null pointers returned for empty slices instead of invalid memory pointers. Note: this is Rust code, not C++."
     },
     {
       "id": "CVE-2026-2759",
+      "bugzilla": 2010933,
+      "commit": "63b7af6ea2eb",
       "component": "Graphics: ImageLib",
       "vuln_type": "boundary-error",
       "severity": "high",
-      "source_dirs": ["image"],
-      "source_files_hint": [],
-      "notes": "Incorrect boundary conditions in image handling"
+      "reporter": "Steven Julian",
+      "source_dirs": ["image/decoders"],
+      "source_files_hint": ["image/decoders/nsAVIFDecoder.cpp"],
+      "functions": ["AVIFDecoderStream::ReadAt()", "AVIFDecoderStream::GetContiguousAccess()"],
+      "notes": "Integer overflow in offset+size before buffer access in AVIF decoder. Fix: use CheckedInt arithmetic."
     },
     {
       "id": "CVE-2026-2760",
+      "bugzilla": 2011062,
+      "commit": "ff716200bcaa",
       "component": "Graphics: WebRender",
       "vuln_type": "sandbox-escape",
       "severity": "high",
-      "source_dirs": ["gfx/wr"],
-      "source_files_hint": [],
-      "notes": "Sandbox escape via boundary error. Note: WebRender is largely Rust, but has C++ bindings"
+      "reporter": "Oskar L",
+      "source_dirs": ["gfx/ycbcr"],
+      "source_files_hint": ["gfx/ycbcr/yuv_convert.cpp"],
+      "functions": ["ConvertYCbCrToRGB32()"],
+      "notes": "Negative origin coordinates and stride parameters allowed buffer access with invalid dimensions. Fix: reject negative values."
     },
     {
       "id": "CVE-2026-2761",
+      "bugzilla": 2011063,
+      "commit": "df50d8c7d373",
       "component": "Graphics: WebRender",
       "vuln_type": "sandbox-escape",
       "severity": "high",
-      "source_dirs": ["gfx/wr"],
-      "source_files_hint": [],
-      "notes": "Sandbox escape"
+      "reporter": "Oskar L",
+      "source_dirs": ["gfx/layers/wr"],
+      "source_files_hint": ["gfx/layers/wr/WebRenderBridgeParent.cpp"],
+      "functions": ["snapshot handling (IPC boundary)"],
+      "notes": "Debug-only assertions not enforced at runtime for IPC snapshot validation. Fix: convert to runtime checks returning IPC_FAIL_NO_REASON."
     },
     {
       "id": "CVE-2026-2771",
+      "bugzilla": 2014593,
+      "commit": "4d6dc9b1da1e",
       "component": "DOM: Core & HTML",
       "vuln_type": "undefined-behavior",
       "severity": "high",
-      "source_dirs": ["dom/base", "dom/html"],
-      "source_files_hint": [],
-      "notes": "Undefined behavior in DOM"
+      "reporter": "Anthropic",
+      "source_dirs": ["dom/base"],
+      "source_files_hint": ["dom/base/Document.cpp"],
+      "functions": ["SimpleHTMLCollection::GetElementAt()"],
+      "notes": "Missing null check before AsElement() on SafeElementAt() result. Fix: add explicit null check."
     },
     {
       "id": "CVE-2026-2794",
+      "bugzilla": 2008365,
+      "commit": "1dce5a7d4ddb",
       "component": "Firefox/Android",
       "vuln_type": "uninitialized-memory",
       "severity": "high",
-      "source_dirs": ["mobile/android"],
-      "source_files_hint": [],
-      "notes": "Information disclosure via uninitialized memory. May be Java/Kotlin, not C++."
+      "reporter": "Steven Julian",
+      "source_dirs": ["dom/ipc"],
+      "source_files_hint": ["dom/ipc/ContentParent.cpp"],
+      "functions": ["ContentParent::RecvGetIconForExtension()"],
+      "notes": "AppendElements() left buffer uninitialized before IPC send. Fix: use InsertElementsAt() to zero-initialize."
     }
   ]
 }
