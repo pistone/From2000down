@@ -68,7 +68,7 @@ def default_ground_truth_path() -> Path:
 
 
 def parse_error_xml(xml_path: Path) -> tuple[int, set[ErrorRecord]]:
-    root = ET.parse(xml_path).getroot()
+    root = _load_xml_root(xml_path)
     total_errors = 0
     deduped: set[ErrorRecord] = set()
 
@@ -163,6 +163,18 @@ def _child_text(node: ET.Element, tag: str) -> str:
     if child is None or child.text is None:
         return ""
     return child.text.strip()
+
+
+def _load_xml_root(xml_path: Path) -> ET.Element:
+    text = xml_path.read_text()
+    try:
+        return ET.fromstring(text)
+    except ET.ParseError as exc:
+        if "junk after document element" not in str(exc):
+            raise
+
+    wrapped = f"<errors>\n{text}\n</errors>"
+    return ET.fromstring(wrapped)
 
 
 def _normalize_file(path_str: str) -> str:

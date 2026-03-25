@@ -43,6 +43,29 @@ def test_parse_error_xml_dedupes_by_file_and_function(tmp_path: Path) -> None:
     assert len(records) == 2
 
 
+def test_parse_error_xml_accepts_top_level_error_fragments(tmp_path: Path) -> None:
+    xml_path = tmp_path / "report.xml"
+    xml_path.write_text(
+        textwrap.dedent(
+            """\
+            <error>
+              <file>/repo/dom/base/Document.cpp</file>
+              <function>Document::HidePopover()</function>
+            </error>
+            <error>
+              <file>/repo/dom/base/Document.cpp</file>
+              <function>Document::ShowPopover()</function>
+            </error>
+            """
+        )
+    )
+
+    total_errors, records = parse_error_xml(xml_path)
+
+    assert total_errors == 2
+    assert len(records) == 2
+
+
 def test_compare_xml_to_ground_truth_matches_suffix_paths_and_mangled_names(tmp_path: Path) -> None:
     xml_path = tmp_path / "report.xml"
     xml_path.write_text(
