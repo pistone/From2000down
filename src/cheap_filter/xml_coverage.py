@@ -151,9 +151,11 @@ def format_summary(summary: CoverageSummary) -> str:
         lines.append("")
         lines.append("Covered CVEs:")
         for match in summary.matches:
+            matched_files = sorted({record.file for record in match.matched_records})
             lines.append(
                 f"- {match.issue.id}: {len(match.matched_records)} matching error pair(s)"
             )
+            lines.append(f"  files: {', '.join(matched_files)}")
 
     return "\n".join(lines)
 
@@ -224,7 +226,27 @@ def _normalize_function_name(name: str) -> str:
 
 
 def _file_matches_hint(record_file: str, hint: str) -> bool:
-    return record_file == hint or record_file.endswith(f"/{hint}")
+    record_parts = tuple(part for part in record_file.split("/") if part)
+    hint_parts = tuple(part for part in hint.split("/") if part)
+
+    if not record_parts or not hint_parts:
+        return False
+
+    if hint in record_file:
+        return True
+
+    if record_parts == hint_parts:
+        return True
+
+    if len(record_parts) >= len(hint_parts) and record_parts[-len(hint_parts):] == hint_parts:
+        return True
+
+    max_shared = min(len(record_parts), len(hint_parts))
+    for shared_len in range(max_shared, 1, -1):
+        if record_parts[-shared_len:] == hint_parts[-shared_len:]:
+            return True
+
+    return False
 
 
 def _record_matches_issue(record: ErrorRecord, issue: GroundTruthIssue) -> bool:
